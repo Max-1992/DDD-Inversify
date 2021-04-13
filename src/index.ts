@@ -1,25 +1,15 @@
-import "reflect-metadata";
-// tslint:disable-next-line:ordered-imports
-import * as bodyParser from "body-parser";
-import * as express from "express";
-import { Container } from "inversify";
+
+// Inversify container
+import { container } from './inversify.config'
+
+// Inversify Express
 import { InversifyExpressServer } from "inversify-express-utils";
-import IUserReadOnlyRepository from "./application/repositories/IUserReadOnlyRepository";
-import AuthServiceLocator from "./configuration/usecases/AuthServiceLocator";
-import { TYPES } from "./constants/types";
-import UserRepository from "./infrastructure/UserRepository";
 
-const container = new Container();
-
-// set up bindings
-container.bind<AuthServiceLocator>(TYPES.AuthServiceLocator).to(AuthServiceLocator);
-container.bind<IUserReadOnlyRepository>(TYPES.IUserReadOnlyRepository).to(UserRepository);
+// Setting Seerver
+import { setUp } from './server'
 
 const server = new InversifyExpressServer(container);
-server.setConfig((application: express.Application) => {
-    application.use(bodyParser.urlencoded({extended: true}));
-    application.use(bodyParser.json());
-});
+server.setConfig(setUp);
 
 const app = server.build();
 
